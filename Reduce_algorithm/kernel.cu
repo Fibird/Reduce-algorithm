@@ -8,7 +8,7 @@
 #define BlocksPerGrid (N + ThreadsPerBlock - 1) / ThreadsPerBlock
 
 // kernel 1 without bank conflict 
-__global__ void NB_addKernel1(const int *a, int *r)
+__global__ void NBC_addKernel1(const int *a, int *r)
 {
 	__shared__ int cache[ThreadsPerBlock];
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
@@ -34,7 +34,7 @@ __global__ void NB_addKernel1(const int *a, int *r)
 }
 
 // kernel 2 without bank conflict 
-__global__ void NB_addKernel2(const int *a, int *r)
+__global__ void NBC_addKernel2(const int *a, int *r)
 {
 	__shared__ int cache[ThreadsPerBlock];
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
@@ -60,7 +60,7 @@ __global__ void NB_addKernel2(const int *a, int *r)
 }
 
 // kernel with bank conflict
-__global__ void B_addKernel(const int *a, int *r)
+__global__ void BC_addKernel(const int *a, int *r)
 {
 	__shared__ int cache[ThreadsPerBlock];
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
@@ -100,7 +100,7 @@ float reduce_sum1(int *a, int *result)
 	// copy data from CPU to GPU
 	cudaMemcpy(dev_a, a, N * sizeof(int), cudaMemcpyHostToDevice);
 
-	B_addKernel<<<BlocksPerGrid, ThreadsPerBlock>>>(dev_a, dev_result);
+	BC_addKernel<<<BlocksPerGrid, ThreadsPerBlock>>>(dev_a, dev_result);
 
 	// copy result from GPU to CPU
 	cudaMemcpy(result, dev_result, BlocksPerGrid * sizeof(int), cudaMemcpyDeviceToHost);
@@ -128,7 +128,7 @@ float reduce_sum2(int *a, int *result)
 	// copy data from CPU to GPU
 	cudaMemcpy(dev_a, a, N * sizeof(int), cudaMemcpyHostToDevice);
 
-	NB_addKernel1<<<BlocksPerGrid, ThreadsPerBlock>>>(dev_a, dev_result);
+	NBC_addKernel1<<<BlocksPerGrid, ThreadsPerBlock>>>(dev_a, dev_result);
 
 	// copy result from GPU to CPU
 	cudaMemcpy(result, dev_result, BlocksPerGrid * sizeof(int), cudaMemcpyDeviceToHost);
@@ -156,7 +156,7 @@ float reduce_sum3(int *a, int *result)
 	// copy data from CPU to GPU
 	cudaMemcpy(dev_a, a, N * sizeof(int), cudaMemcpyHostToDevice);
 
-	NB_addKernel2<<<BlocksPerGrid, ThreadsPerBlock>>>(dev_a, dev_result);
+	NBC_addKernel2<<<BlocksPerGrid, ThreadsPerBlock>>>(dev_a, dev_result);
 
 	// copy result from GPU to CPU
 	cudaMemcpy(result, dev_result, BlocksPerGrid * sizeof(int), cudaMemcpyDeviceToHost);
