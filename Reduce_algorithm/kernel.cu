@@ -210,7 +210,7 @@ int main()
 		result[0] += result[i];
 
 	// print final result and time
-	printf("***Result of Reduce sum V2***\n");
+	printf("***Result of Reduce sum V3***\n");
 	printf("Is the result %d equal to %d?\n", result[0], N);
 	printf("Time of computing is %.3lfms\n", elapsedTime);
 	// free
